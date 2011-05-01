@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?oxygen RNGSchema="file:../schema/xobis.rnc" type="compact"?>
+<atom:feed xmlns:atom="http://www.w3.org/2005/Atom" xmlns:xobis="http://www.xobis.info/ns/2.0/">
+    <!-- link/id for this feed's record, not link back to the feed -->
+    <atom:id>http://xobis.info/ark:/12345/de45rf5</atom:id>
+    <!-- title of this feed -->
+    <atom:title>XOBIS Record Feed</atom:title>
+    <!-- organization or person responsible for this feed -->
+    <atom:author>
+        <!-- display name for this organization from its organization record -->
+        <atom:name>XOBIS Library</atom:name>
+        <!-- email for administrative contact for this feed -->
+        <atom:email>feed@xobis.info</atom:email>
+        <!-- should be link to the record for this organization rather than URL for organization -->
+        <atom:uri>http://xobis.info/ark:/12345/de453w5</atom:uri>
+    </atom:author>
+    <!-- reference to software used to generate this feed -->
+    <atom:generator uri="http://freelibrary.info/projects/xobis-fg" version="0.1">XOBIS Feed
+        Generator</atom:generator>
+    <!-- human readable rights -->
+    <atom:rights type="xhtml">
+        <div xmlns="http://www.w3.org/1999/xhtml">To the extent possible under law, the authors have
+            waived all copyright and related or neighboring rights to this data. <a target="_blank"
+                href="http://creativecommons.org/publicdomain/zero/1.0/"
+                title="Creative Commons Zero (CC0) definition">
+                <img src="http://datadryad.org/themes/Dryad/images/cc-zero.png"/>
+            </a>
+            <a href="http://opendefinition.org/" target="_blank"
+                title="Open Definition's definition of Open Data">
+                <img src="http://datadryad.org/themes/Dryad/images/opendata.png"/>
+            </a>
+        </div>
+    </atom:rights>
+    <!-- when feed was last updated -->
+    <atom:updated>2003-12-13T18:30:02Z</atom:updated>
+    <!-- link back to the feed (how to get it) -->
+    <atom:link href="http://xobis.info/feed" rel="self" type="application/atom+xml;profile=xobis"/>
+    <!-- machine readable license -->
+    <atom:link rel="license" type="application/rdf+xml"
+        href="http://http://creativecommons.org/about/cc0/rdf"/>
+    <!-- the xobis record -->
+    <atom:entry>
+        <atom:id>http://xobis.info/ark:/12345/gh49rf5</atom:id>
+        <!-- display form of this principal element -->
+        <atom:title>Clarke, Kevin S. (Kevin Sean)</atom:title>
+        <!-- when this record was last updated -->
+        <atom:updated>2003-12-13T18:30:02Z</atom:updated>
+        <xobis:being role="authority">
+            <xobis:entry>
+                <xobis:name>
+                    <xobis:part type="paternal surname">Clarke</xobis:part>
+                    <xobis:part type="given">Kevin S.</xobis:part>
+                    <xobis:part type="expansion">Kevin Sean</xobis:part>
+                </xobis:name>
+                <xobis:qualifiers>
+                    <xobis:duration>
+                        <xobis:time>
+                            <xobis:year>1970</xobis:year>
+                        </xobis:time>
+                    </xobis:duration>
+                </xobis:qualifiers>
+            </xobis:entry>
+        </xobis:being>
+        <!--
+            href is to the Being of this relationship
+            rel is to the relationship name's record (in this case, Author)
+            title is the optionaldisplay form of the principal element
+            type indicates the relationship links to another xobis record
+        -->
+        <atom:link href="http://xobis.info/ark:/12345/g2h29rf2"
+            type="application/atom+xml;profile=xobis" rel="http://xobis.info/ark:/12345/3e4r55"
+            title="Being Relationship" xobis:type="associative">
+            <xobis:name>Author</xobis:name>
+            <xobis:being>
+                <xobis:name>asdf</xobis:name>
+            </xobis:being>
+        </atom:link>
+<!--
+        <atom:link href="http://xobis.info/ark:/12345/g2119rf2"
+            type="application/atom+xml;profile=xobis"
+            rel="http://xobis.info/ark:/12345/3e4r11"
+            title="Organization">
+            <xobis:being>asdf</xobis:being>
+        </atom:link>-->
+    </atom:entry>
+</atom:feed>

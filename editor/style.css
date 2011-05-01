@@ -1,0 +1,183 @@
+html,body {
+    margin: 0;
+    padding: 0
+}
+body {
+    font: 85%/1.3 Verdana,Arial,sans-serif;
+    text-align: center;
+    background: #9684c3;
+    padding-bottom: 20px;
+    color: white;
+}
+p {
+    margin-top: 0
+}
+h1, h2, h3 {
+    font: normal normal 200% "Trebuchet MS", Arial, sans-serif
+}
+h1 span {
+    font-size: 60%;
+    vertical-align: text-top;
+}
+h2 {
+    font-size: 160%
+}
+h3 {
+    font-size: 120%
+}
+div#header {
+    width: 100%;
+    overflow: hidden;
+    background: #463965;
+}
+div#header h1, div#menu {
+    width: 790px;
+    margin: 0 auto;
+    text-align: left
+}
+div#header h1 {
+    padding: 15px 0 5px;
+}
+/* top tabs */
+ul#nav, ul#nav li {
+    list-style-type: none;
+    margin: 0;
+    padding: 0
+}
+/* top tabs */
+ul#nav {
+    float: right;
+    width: auto;
+    font-size: 80%
+}
+/* top tabs */
+ul#nav li {
+    float: left;
+    width: auto;
+    margin-left: 3px;
+    text-align: center
+}
+/* links in top tabs */
+ul#nav li {
+    float: left;
+    width: 95px;
+    padding: 5px 0;
+    background: #369a3d;
+    text-decoration: none;
+    color: white;
+}
+ul#nav li#activetab, ul#nav li#activetab:hover {
+    background: white;
+    color: #369a3d;
+    font-weight: bold;
+}
+div#container {
+    width: 790px;
+    margin: 0 auto 10px;
+    padding: 20px 0 10px;
+    text-align: left;
+    background: white;
+}
+div#content {
+    float: left;
+    display: inline;
+    width: 605px;
+    margin: 0 0 10px 10px;
+}
+div#content div {
+    color: black;
+}
+
+ul#recordTabs,ul#recordTabs li {
+    list-style-type: none;
+    margin: 0;
+    padding: 0
+}
+ul#recordTabs {
+    width: 100%;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+ul#recordTabs li {
+    float: left;
+    width: 175px;
+    margin-right: 10px;
+    padding: 2px 3px;
+    padding-top: 4px;
+    text-align: center;
+}
+/* inside top boxes */
+li.innerTab {
+    background: #369a3d;
+}
+li.innerTab p {
+    text-align: right;
+    font-size: smaller;
+    text-decoration: none;
+}
+li.innerTab h3 {
+    margin-right: 10px;
+}
+li.innerTab h3 span {
+    font-size: x-small;
+}
+li.innerTab h3 a {
+    text-decoration: none;
+}
+ul#recordTabs p, ul#recordTabs h3 {
+    margin:0;
+    padding: 0 10px
+}
+ul#recordTabs h3 {
+    text-transform: uppercase;
+    padding-bottom: 3px;
+}
+/* Main content text headers */
+div#content h2 {
+    margin: 10px 0;
+    color: #463965;
+}
+/* Side */
+div#side {
+    float: right;
+    display: inline;
+    width: 165px;
+    margin: 10px 5px 20px 5px;
+}
+div#side div {
+    text-align: center;
+/* font-size: smaller; */
+    padding: 4px 15px;
+    margin: 5px;
+    text-transform: uppercase;
+}
+div#side div.pe {
+    text-align: left;
+    background: #453965;
+}
+div#side div.pe span {
+    background: #261257;
+    margin: 0px;
+    padding: 0px;
+}
+div#side div.pe:hover {
+    background: #369A3C;
+}
+/* Footer */
+div#footer {
+    clear: both;
+    width: 775px;
+    margin: 0 7px 0;
+    padding: 10px 0;
+    background: #463965;
+    text-align: center;
+}
+div#footer p {
+    margin:0
+}
+div#footer p a {
+    color: white;
+}
+div#footer p span {
+    font-size: smaller;
+}

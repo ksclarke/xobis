@@ -1,0 +1,871 @@
+namespace atom = "http://www.w3.org/2005/Atom"
+namespace local = ""
+namespace s = "http://www.ascc.net/xml/schematron"
+namespace xlink = "http://www.w3.org/1999/xlink"
+namespace xobis = "http://www.xobis.info/ns/2.0/"
+
+include "atom.rnc" {
+    # 
+    # Atom's undefined attribute extended to exclude xobis attributes
+    #
+    undefinedAttribute = attribute * - (xml:base | xml:lang | local:* | xobis:*) { text }
+    # 
+    # Atom's entry element extended to include a xobis principal element
+    #
+    atomEntry =
+        element atom:entry {
+            atomCommonAttributes,
+            (atomAuthor*
+             & atomCategory*
+             & atomContent?
+             & atomContributor*
+             & atomId
+             & atomLink*
+             & atomPublished?
+             & atomRights?
+             & atomSource?
+             & atomSummary?
+             & atomTitle
+             & atomUpdated
+             & (conceptPE
+                | beingPE
+                | stringPE
+                | languagePE
+                | orgPE
+                | placePE
+                | eventPE
+                | objectPE
+                | workPE)
+             & extensionElement*)
+        }
+    # 
+    # Atom's link extended to include xobis relationship attributes and elements
+    #
+    atomLink =
+        element atom:link {
+            atomCommonAttributes
+            & attribute href { atomUri }
+            & attribute rel { atomNCName | atomUri }
+            & attribute type { atomMediaType }?
+            & attribute hreflang { atomLanguageTag }?
+            & attribute title { text }?
+            & attribute length { text }?
+            & _relationshipContent?
+            & anyForeignElement*
+        }
+    #   
+    # Atom's simple extension extended to exclude xobis namespaced elements
+    #
+    simpleExtensionElement = element * - (atom:* | xobis:*) { text }
+    # 
+    # Atom's structured extension extended to exclude xobis namespaced elements
+    #
+    structuredExtensionElement =
+        element * - (atom:* | xobis:*) {
+            (attribute * { text }+,
+             (text | anyElement)*)
+            | (attribute * { text }*,
+               (text?, anyElement+, (text | anyElement)*))
+        }
+    # 
+    # Atom's foreign element extended to exclude xobis namespaced elements
+    #
+    anyForeignElement =
+        element * - (atom:* | xobis:*) {
+            (attribute * { text }
+             | text
+             | anyElement)*
+        }
+}
+# 
+#
+_relationshipContent =
+    attribute xobis:type {
+        string "subordinate"
+        | string "superordinate"
+        | string "preordinate"
+        | string "postordinate"
+        | string "associative"
+        | string "dissociative"
+    }?,
+    ((attribute xobis:degree {
+          string "primary" | string "secondary" | string "tertiary" | string "broad"
+      }?,
+      _relationshipName,
+      (timeRef | durationRef)?,
+      conceptRef)
+     | (attribute xobis:degree { string "primary" | string "secondary" }?,
+        _relationshipName,
+        (timeRef | durationRef)?,
+        (beingRef | stringRef | languageRef | orgRef | placeRef | eventRef | objectRef | workRef)))
+# 
+# 
+#
+_relationshipName |=
+    element xobis:name { content_ },
+    element xobis:modifier {
+        attribute nonfiling { xsd:positiveInteger }?,
+        content_
+    }?
+# 
+# ******************************************************************************
+#                                    CONCEPT
+# ******************************************************************************
+# 
+# Concept includes ...
+#
+conceptPE |=
+    element xobis:concept {
+        attribute type {
+            string "abstract" | string "collective" | string "control" | string "specific"
+        }?,
+        (attribute usage { string "subdivision" },
+         attribute subtype {
+             string "general" | string "form" | string "topical" | string "unspecified"
+         })?,
+        element xobis:entry { optScheme_, _conceptEntryContent },
+        element xobis:variant {
+            type_?,
+            (timeRef | durationRef)?,
+            element xobis:entry { substituteAttribute, optScheme_, _conceptEntryContent },
+            optNoteList_
+        }*,
+        optNoteList_
+    }
+# 
+# ConceptEntrycontent_ is the main content of a Concept; it is referenced from the
+# ConceptReference, Concept Entry and Concept variants.
+#
+_conceptEntryContent |= genericName, qualifiersOpt
+# 
+# ConceptReference is the form of Concept that is referenced from other XOBIS
+# records.
+#
+conceptRef |= element xobis:concept { linkAttributes_?, _conceptEntryContent, optSubdivision_ }
+# 
+# ******************************************************************************
+#                                    EVENT
+# ******************************************************************************
+# 
+# Event includes all sorts of named happenings or occurrences, deliberate or not
+# (it excludes micro-events and named processes, etc., which are generally
+# categorical rather than referring to specific occurrences).  The emphasis in
+# Event is on the named happening or occurrence; organizational involvements are
+# treated as relationships.
+#
+eventPE |=
+    element xobis:event {
+        attribute type {
+            string "natural"
+            | string "meeting"
+            | string "journey"
+            | string "occurrence"
+            | string "miscellaneous"
+        }?,
+        # 
+        # Principal element classes are: individual, collective, and referential
+        #
+        optClass_,
+        element xobis:entry { optScheme_, _eventEntryContent },
+        element xobis:variant {
+            type_?,
+            (timeRef | durationRef)?,
+            element xobis:entry { substituteAttribute, optScheme_, _eventEntryContent },
+            optNoteList_
+        }*,
+        optNoteList_
+    }
+# 
+# EventEntrycontent_ is the main content of a Event; it is referenced from the
+# EventReference, Event Entry and Event variants.
+#
+_eventEntryContent |= preQualifiersOpt, genericName, qualifiersOpt
+# 
+# EventReference is the form of Event that is referenced from other XOBIS
+# records.
+#
+eventRef |= element xobis:event { linkAttributes_?, _eventEntryContent }
+# 
+# ******************************************************************************
+#                                 ORGANIZATION
+# ******************************************************************************
+# 
+# Organization includes ...
+#
+orgPE |=
+    element xobis:organization {
+        attribute type {
+            string "business" | string "government" | string "nonprofit" | string "other"
+        }?,
+        # 
+        # Principal element classes are: individual, collective, and referential
+        #
+        optClass_,
+        element xobis:entry { optScheme_, _orgEntryContent },
+        element xobis:variant {
+            type_?,
+            (timeRef | durationRef)?,
+            element xobis:entry { substituteAttribute, optScheme_, _orgEntryContent },
+            optNoteList_
+        }*,
+        optNoteList_
+    }
+# 
+# OrgEntrycontent_ is the main content of an Organization; it is
+# referenced from the OrganizationReference, Organization Entry and Organization
+# variants.
+#
+_orgEntryContent |= preQualifiersOpt, genericName, qualifiersOpt
+# 
+# OrganizationReference is the form of Organization that is referenced from
+# other XOBIS records.
+#
+orgRef |= element xobis:organization { linkAttributes_?, _orgEntryContent, optSubdivision_ }
+# 
+# ******************************************************************************
+#                                     PLACE
+# ******************************************************************************
+# 
+# Place includes ...
+#
+placePE |=
+    element xobis:place {
+        roleAttributes_,
+        attribute type { string "natural" | string "constructed" | string "juridictional" }?,
+        # 
+        # Principal element classes are: individual, collective, and referential
+        #
+        optClass_,
+        # 
+        # Whether this Place can be used as a subdivision on another record; if
+        # so, this attribute is included in the record
+        #
+        attribute usage { string "subdivision" }?,
+        element xobis:entry { optScheme_, _placeEntryContent },
+        element xobis:variant {
+            type_?,
+            (timeRef | durationRef)?,
+            element xobis:entry { substituteAttribute, optScheme_, _placeEntryContent },
+            optNoteList_
+        }*,
+        optNoteList_
+    }
+# 
+# PlaceEntrycontent_ is the main content of a Place; it is referenced from the
+# PlaceReference, Place Entry and Place variants.
+#
+_placeEntryContent |= genericName, qualifiersOpt
+# 
+# PlaceReference is the form of Place that is referenced from other XOBIS
+# records.
+#
+placeRef |= element xobis:place { linkAttributes_?, _placeEntryContent }
+# 
+# ******************************************************************************
+#                                    STRING
+# ******************************************************************************
+# 
+# Strings are individual words or phrases that are similiar to Concepts but with
+# less control.
+#
+stringPE |=
+    element xobis:string {
+        attribute type { string "textual" | string "numeric" | string "mixed" }?,
+        ((attribute class { string "word" },
+          attribute grammar {
+              string "noun"
+              | string "verb"
+              | string "pronoun"
+              | string "adjective"
+              | string "adverb"
+              | string "preposition"
+              | string "conjunction"
+              | string "interjection"
+          }?)
+         | attribute class { string "phrase" })?,
+        element xobis:entry { _stringEntryContent },
+        element xobis:variant {
+            type_?,
+            (timeRef | durationRef)?,
+            element xobis:entry { substituteAttribute, _stringEntryContent },
+            optNoteList_
+        }*,
+        optNoteList_
+    }
+# 
+# StringEntrycontent_ is the main content of a String; it is referenced from the
+# StringInstance, String Entry and String variants.
+#
+_stringEntryContent |= genericName, qualifiersOpt
+# 
+# StringInstance is the form of String that is referenced from other XOBIS
+# records.
+#
+stringRef |= element xobis:string { linkAttributes_?, _stringEntryContent }
+# 
+# ******************************************************************************
+#                                   LANGUAGE
+# ******************************************************************************
+# 
+# Language, one of XOBIS' ten principal elements, is a specific spoken, written,
+# or signed communication systems.
+#
+languagePE |=
+    element xobis:language {
+        # 
+        # A time duration that serves a referential, or informational purpose.
+        #
+        optClass_,
+        # 
+        # If usage='subdivision' occurs it means this heading may be used as
+        # a subdivision on a relationship (like an LCSH subdivision).
+        #
+        attribute usage { "subdivision" }?,
+        element xobis:entry { _langEntryContent },
+        element xobis:variant {
+            type_?,
+            (timeRef | durationRef)?,
+            element xobis:entry { substituteAttribute, _langEntryContent },
+            optNoteList_
+        }*,
+        optNoteList_
+    }
+# 
+# LanguageEntrycontent_ is the main content of a Language; it is referenced from
+# the LanguageInstance, Language main entry and Language variants.
+#
+_langEntryContent |=
+    element xobis:name { nameContent_ },
+    qualifiersOpt
+# 
+# LanguageInstance is the form of Language that is referenced from other XOBIS
+# records.
+#
+languageRef |= element xobis:language { linkAttributes_?, _langEntryContent, optSubdivision_ }
+# 
+# ******************************************************************************
+#                                     TIME
+# ******************************************************************************
+# 
+# Time, one of XOBIS' ten principal elements, is an authority record for
+# chronological designations.
+#
+timePE |=
+    element xobis:time {
+        # 
+        # A time instance that serves a referential, or informational, purpose.
+        #
+        optClass_,
+        # 
+        # If usage='subdivision' occurs it means this heading may be used as
+        # a subdivision on a relationship (like an LCSH subdivision).
+        #
+        attribute usage { "subdivision" }?,
+        # 
+        # This is the content for a single time instance, not a Time Duration.
+        #
+        _timeInstanceEntry,
+        # 
+        # Alternate forms of the time; we allow variants of a time instance to
+        # be a duration because they may be from a different time scheme.
+        #
+        _timeVariant+,
+        # 
+        # General notes about the time instance represented by our Time.
+        #
+        optNoteList_
+    }
+    | element xobis:duration {
+          # 
+          # A time duration that serves a referential, or informational purpose.
+          #
+          optClass_,
+          # 
+          # If usage='subdivision' occurs it means this heading may be used as
+          # a subdivision on a relationship (like an LCSH subdivision).
+          #
+          attribute usage { "subdivision" }?,
+          # 
+          # This is the content for a time duration, not a single time instance.
+          #
+          _timeDurationEntry,
+          # 
+          # Alternate forms of the time; we allow variants of a time instance to
+          # be a duration because they may be from a different time scheme.
+          #
+          _timeVariant+,
+          # 
+          # General notes about the time duration represented by our Duration.
+          #
+          optNoteList_
+      }
+# 
+# 
+#
+_timeVariant |= element xobis:variant { type_?, (_timeInstanceEntry | _timeDurationEntry) }
+# 
+# TimeInstance is the singular form of time that is referenced from other
+# XOBIS records.
+#
+timeRef |=
+    element xobis:time {
+        attribute calendar { text }?,
+        linkAttributes_?,
+        (_timeEntryContent | xsd:dateTime)
+    }
+# 
+# TimeInstancecontent_ is the bulk of what constitutes a TimeInstance.
+#
+_timeInstanceEntry |=
+    element xobis:entry {
+        optScheme_,
+        attribute calendar { text }?,
+        _timeEntryContent
+    }
+# 
+# TimeDuration is the plural form of time that may be referenced from other
+# records.  Durations may have a single start and end or just a start or end.
+# They may also have a start and end that contains parts.
+#
+durationRef |=
+    element xobis:duration {
+        attribute calendar { text }?,
+        linkAttributes_?,
+        element xobis:time { _timeEntry },
+        element xobis:time { _timeEntry }?
+    }
+# 
+# TimeDurationcontent_ is the bulk of what constitutes a TimeDuration; it is
+# separate because some Durations contain a Type element while others do not.
+#
+_timeDurationEntry |=
+    # 
+    # Q: Is having scheme and calendar at the entry level a duplication of
+    # data for a Duration (Time is unlike any other PE b/c of the Duration
+    # aspect)?
+    # 
+    # Options: Put it on the parent element, but scheme really is about the
+    # entry and not the whole thing (variants may be from other schemes)...
+    #
+    element xobis:entry {
+        optScheme_,
+        attribute calendar { text }?,
+        _timeEntry
+    },
+    element xobis:entry {
+        optScheme_,
+        attribute calendar { text }?,
+        _timeEntry
+    }
+# 
+# TimeEntry is the substructure of times found in the Time principal element's
+# entry, the target of a relationship, the time qualifier, and anywhere else
+# times are used in XOBIS.  It may contain the time substructure directly or
+# represent a time that has two components (for instance, some serials have a
+# structure like: [start]1983/84-[end]1984/85).
+#
+_timeEntry |=
+    _timeEntryContent
+    | (element xobis:part { _timeEntryContent },
+       element xobis:part { _timeEntryContent })
+# 
+# TimeEntrycontent_ is the XOBIS representation of time. It is used in various
+# places throughout the schema (e.g., it may be the target of a relationship,
+# the main entry on a Time principal element, or an embedded relationship (cf.
+# its use in Action in the ControlData section)).  Entry contains two possible
+# substructures: a numeric structure (YMD HMS ms) and a named time option.
+#
+_timeEntryContent |=
+    # 
+    # The type of time this information represents.
+    #
+    type_?,
+    # 
+    # How sure we are of the information recorded.
+    #
+    element xobis:certainty {
+        attribute set { text },
+        content_
+    }?,
+    # 
+    # The core time structure basically allows the expression of time in
+    # numeric form with the following (optional) characteristics: year,
+    # month, day, hour, minute, second, milliseconds, timezone offset in
+    # hour, and timezone offset in minutes.
+    #
+    ((_year, _month?, _day?, (_hour, _tzHour?)?, (_minute, _tzMinute?)?, _second?, _milliseconds?)
+     | (_month, _day?, (_hour, _tzHour?)?, (_minute, _tzMinute?)?, _second?, _milliseconds?)
+     | (_day, (_hour, _tzHour?)?, (_minute, _tzMinute?)?, _second?, _milliseconds?)
+     | _milliseconds
+     | # 
+       # A time with a specific name instead of a numeric designation.
+       #
+       genericName)
+# 
+# A year is an integer value in XOBIS.  Dates that include 'uu' in MARC should
+# be represented with a Certainty value.
+#
+_year |= element xobis:year { xsd:positiveInteger }
+_month |= element xobis:month { xsd:positiveInteger }
+_day |= element xobis:day { xsd:positiveInteger }
+_hour |= element xobis:hour { xsd:positiveInteger }
+_minute |= element xobis:minute { xsd:positiveInteger }
+_second |= element xobis:second { xsd:positiveInteger }
+_milliseconds |= element xobis:millisecs { xsd:positiveInteger }
+# 
+# A timezone offset for the local hour may be a positive or negative integer.
+#
+_tzHour |= element xobis:TZHour { xsd:integer }
+# 
+# A timezone offset for the local minutes may be a positive or negative integer.
+#
+_tzMinute |= element xobis:TZMinute { xsd:integer }
+# 
+# ******************************************************************************
+#                                  BEING
+# ******************************************************************************
+# 
+# Being, one of XOBIS' ten principal elements, is an authority record for 
+# tangible or intangible beings.  A being may be living/dead and/or may be
+# a personification.
+#
+beingPE |=
+    element xobis:being {
+        roleAttributes_,
+        attribute type { string "human" | string "nonhuman" | string "special" }?,
+        attribute class {
+            string "individual"
+            | string "familial"
+            | string "collective"
+            | string "undifferentiated"
+            | string "referential"
+        }?,
+        element xobis:entry {
+            optScheme_,
+            # 
+            # Most main entries don't have a generic type, but Being records may
+            # be for real names or pseudonyms (unlike other principal elements).
+            #
+            type_?,
+            # 
+            # Since Being entries may have a generic type (making it possible to
+            # have more than one record for a person), we have an optional time
+            # or duration to represent when the entry form was appropriate. This
+            # split keeps us in sync with current cataloging practices.
+            #
+            (timeRef | durationRef)?,
+            _beingEntryContent
+        },
+        element xobis:variant {
+            type_?,
+            (timeRef | durationRef)?,
+            element xobis:entry { substituteAttribute, optScheme_, _beingEntryContent },
+            optNoteList_
+        }*,
+        optNoteList_
+    }
+# 
+# BeingInstance is the form of Being that is referenced from other XOBIS
+# records.
+#
+beingRef |= element xobis:being { linkAttributes_?, _beingEntryContent }
+# 
+# BeingEntrycontent_ is the main content of a being; it is referenced from the
+# BeingInstance, Being Entry and Being variants.
+#
+_beingEntryContent |=
+    element xobis:name {
+        nameContent_
+        | (element xobis:part {
+               attribute type { string "given" | string "surname" | string "expansion" },
+               nameContent_
+           }+
+           | element xobis:part {
+                 attribute type {
+                     string "given"
+                     | string "paternal surname"
+                     | string "maternal surname"
+                     | string "expansion"
+                 },
+                 nameContent_
+             }+)
+    },
+    qualifiersOpt
+# 
+# ******************************************************************************
+#                                    OBJECT
+# ******************************************************************************
+# 
+# Object, one of XOBIS' ten principal elements, ...
+#
+objectPE |=
+    element xobis:object {
+        (attribute role { string "instance" | string "authority instance" },
+         attribute class { string "individual" | string "collective" }?,
+         _objectContent,
+         versionsHoldingsOpt)
+        | (attribute role { string "authority" },
+           optClass_,
+           _objectContent)
+    }
+# 
+# The content of a XOBIS Object that is the same regardless of whether it is
+# just an authority or an authority and instance (or instance alone)
+#
+_objectContent |=
+    ((attribute type { string "natural" | string "crafted" }?,
+      element xobis:entry {
+          _objectEntryContent,
+          element xobis:organization {
+              linkAttributes_,
+              element xobis:identifier { content_ }?
+          }
+      })
+     | (attribute type { string "manufactured" }?,
+        element xobis:entry { _objectEntryContent })),
+    element xobis:variant {
+        # NEEDED? attribute idref { xsd:IDREF }?,
+        type_?,
+        (timeRef | durationRef)?,
+        element xobis:entry { substituteAttribute, optScheme_, _objectEntryContent },
+        optNoteList_
+    }*,
+    optNoteList_
+# 
+# ObjectEntrycontent_ is the main content of an Object; it is referenced from
+# the ObjectReference, Object main entry and Object variants.
+#
+_objectEntryContent |= genericName, qualifiersOpt
+# 
+# ObjectReference is the form of Object that is referenced from other XOBIS
+# records.
+#
+objectRef |= element xobis:object { linkAttributes_?, _objectEntryContent }
+# 
+# ******************************************************************************
+#                                     WORK
+# ******************************************************************************
+# 
+# Work, one of XOBIS' ten principal elements, ...
+#
+workPE |=
+    element xobis:work {
+        attribute type { string "intellectual" | string "artistic" }?,
+        ((attribute role { string "instance" | string "authority instance" },
+          _workContent,
+          versionsHoldingsOpt)
+         | (attribute role { string "authority" },
+            _workContent))
+    }
+# 
+# 
+#
+_workContent |=
+    element xobis:entry {
+        attribute class {
+            string "individual" | string "serial" | string "collective" | string "referential"
+        }?,
+        _workEntryContent
+    },
+    element xobis:variant {
+        # NEEDED? attribute idref { xsd:IDREF }?,
+        type_?,
+        (timeRef | durationRef)?,
+        element xobis:entry { substituteAttribute, optScheme_, _workEntryContent },
+        optNoteList_
+    }*,
+    optNoteList_
+# 
+# WorkEntrycontent_ is the main content of an Work; it is referenced from
+# the WorkReference, Work main entry and Work variants.
+#
+_workEntryContent |=
+    element xobis:name {
+        (attribute type { string "generic" },
+         nameContent_)
+        | element xobis:part {
+              attribute type { string "subtitle" | string "section" | string "generic" }?,
+              nameContent_
+          }+
+    },
+    qualifiersOpt
+# 
+# WorkReference is the form of Work that is referenced from other XOBIS
+# records.
+#
+workRef |= element xobis:work { linkAttributes_?, _workEntryContent }
+# 
+# ******************************************************************************
+#                                   VERSIONS
+# ******************************************************************************
+# 
+# Versions and/or holdings
+#
+versionsHoldingsOpt |=
+    (element xobis:versions {
+         element xobis:version {
+             #NEEDED? attribute id { xsd:ID },
+             element xobis:entry {
+                 element xobis:name { nameContent_ },
+                 qualifiersOpt
+             },
+             optNoteList_,
+             _holdings
+         }+
+     }
+     | _holdings)?
+# 
+# This is just a placeholder for a holdings schema (it may be best to reuse one
+# someone else has defined)
+# TODO - remove, we'll use external holdings standards
+#
+_holdings |= element xobis:holdings { content_ }
+# 
+# ******************************************************************************
+#                                   QUALIFIERS
+# ******************************************************************************
+# 
+# Qualifiers are principal element entries that are used to disambiguate other
+# principal elements. Prequalifiers precede the principal element's Entry.
+#
+preQualifiersOpt |= element xobis:qualifiers { (eventRef | orgRef | placeRef)+ }?
+# 
+# Qualifiers are principal element entries that are used to disambiguate other
+# principal elements. Qualifiers follow the principal element's Entry.
+#
+qualifiersOpt |=
+    element xobis:qualifiers {
+        (conceptRef
+         | eventRef
+         | stringRef
+         | languageRef
+         | (timeRef | durationRef)
+         | beingRef
+         | placeRef
+         | orgRef
+         | objectRef
+         | workRef)+
+    }?
+# 
+# ******************************************************************************
+#                                 RELATIONSHIPS
+# ******************************************************************************
+# 
+# A relationship with an idref is a relationship that is valid for a particular
+# version on a XOBIS record
+#
+
+# 
+# 
+#
+
+# optNoteList_
+# 
+# 
+# Name is the anchor for many of the principal elements' entries.  It is also
+# used in variant entries and as the target of a relationship between entries.
+# There is the possibility for a name to have more than one part (e.g., like a
+# work may have a title proper and a subtitle), but this is different from an
+# entry that has multiple components of a different type (e.g., uniform titles
+# may be qualified by a date), which would be handled by qualifiers.
+#
+
+## relationshipWithIDRef |=
+##    element relationship {
+##        attribute idref { xsd:IDREF }?,
+##        _relationshipContent
+##    }
+genericName |=
+    element xobis:name {
+        nameContent_
+        | element xobis:part { nameContent_ }+
+    }
+# 
+# The structure of the name entry, which is the same for the Name component as
+# it is for the repeatable Name/Part (an alternate form of the component).
+#
+nameContent_ |=
+    (attribute lang { text },
+     attribute translit { text }?)?,
+    attribute nonfiling { xsd:positiveInteger }?,
+    text
+# 
+# If there is a work with established forms, 'scheme' records where the authorized
+# form is from
+#
+optScheme_ |= attribute scheme { text }?
+# 
+# A Value is like Name, but not so complex (it is not so much data found in
+# the wild as it is a data used with a specific purpose). An example of its
+# use would be in XOBIS' entry substitues.
+#
+value_ |= element xobis:value { content_ }
+# 
+# Generic content is just text that has a language attribute. It is the simplified
+#
+content_ |=
+    attribute lang { text }?,
+    text
+# 
+# 
+#
+optClass_ |= attribute class { string "individual" | string "collective" | string "referential" }?
+# 
+# Generic subdivisions can be used in several principal elements to create a
+# hierarchy within the principal element using references to other principal
+# elements (this is different from qualifying a principal element).
+#
+optSubdivision_ |= element xobis:subdivision { linkContent_ }*
+# 
+# 
+#
+roleAttributes_ |=
+    attribute role { string "instance" | string "authority" | string "authority instance" }
+# 
+# A key component of XOBIS' reliance on authorities is the Type element.  This
+# combined with the set attribute provides a mechanism for controlling values. 
+#
+type_ |=
+    element xobis:type {
+        linkAttributes_,
+        attribute xlink:role { xsd:anyURI },
+        empty
+    }?
+# 
+# 
+#
+linkAttributes_ |=
+    attribute xlink:href { xsd:anyURI }?,
+    attribute xlink:title { text }
+# 
+# A generic link is when a link is created to a XOBIS record by using its ID and,
+# optionally, one of its entry substitutes.  It is an easy way of making a link
+# to another record inside or outside the local system.
+#
+linkContent_ |=
+    (linkAttributes_,
+     attribute substitute {
+         string "abbrev" | string "citation" | string "code" | string "singular"
+     }?)?,
+    content_
+# 
+# ??
+#
+substituteAttribute |=
+    attribute type { string "abbrev" | string "citation" | string "code" | string "singular" }?
+# A generic note structure (that contains more than one note) that can be used
+# in various places in a record
+#
+optNoteList_ |=
+    (element xobis:noteList { note_+ }
+     | note_)?
+# 
+# A generic note that can be used in various places in a record
+#
+note_ |=
+    element xobis:note {
+        attribute class { "transcription" | "annotation" | "documentation" | "description" }?,
+        (linkAttributes_,
+         attribute xlink:role { xsd:anyURI })?,
+        content_
+    }
