@@ -1,0 +1,1903 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    XOBIS: XML Organic Bibliographic Information Schema (v. 1.0a)
+       Copyright 2002 by Lane Medical Library, Stanford University
+      
+       This information may be copied, distributed and/or modified
+       under certain conditions, but it comes WITHOUT ANY WARRANTY;
+       see the Design Science License (DSL) for more details.
+      
+       If the schema was not accompanied by its license, view an online
+       version of the license at http://laneweb.stanford.edu:2380/license.html
+   
+       Alpha version of schema developed by Kevin S. Clarke, Mary Buttner,
+       Maria Feng, Ying Li, Pam Murnane, Jo Wang, Rebecca Wesley, 
+       Charles Yates, Danjin Zhu, and Dick R. Miller, 
+       members of the Medlane Project at Lane Medical Library, Stanford.
+        
+       Developed: Dec. 2001-Sept. 2002
+       Completed: Friday, Sept. 13, 2002
+       Public Release: 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+<grammar xmlns="http://relaxng.org/ns/structure/1.0"
+    ns="http://medlane.stanford.edu/ns/xobis/1.0a"
+    xmlns:a="http://medlane.stanford.edu/ns/annotation/1.0"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:cc="http://www.xml.gr.jp/xmlns/relaxngcc"
+    cc:package="info.medlane.xobis">
+       
+    <!-- ********************* OVERVIEW ******************** -->
+    
+    <start>
+        <element name="RecordList">
+            <oneOrMore>
+                <element name="Record">
+                    <ref name="GenericLangAttribute"/>
+                    <ref name="ControlData"/>
+                    <choice>
+                        <ref name="Concept"/>
+                        <ref name="String"/>
+                        <ref name="Language"/>
+                        <ref name="Organization"/>
+                        <ref name="Event"/>
+                        <ref name="Time"/>
+                        <ref name="Place"/>
+                        <ref name="Being"/>
+                        <ref name="Object"/>
+                        <ref name="Work"/>
+                    </choice>
+                    <ref name="Relationships"/>
+                </element>
+            </oneOrMore>
+        </element>
+    </start>
+
+    <!-- *********************** CONTROL_DATA *********************** -->
+    
+    <define name="ControlData">
+        <element name="ControlData">
+            <element name="ID">
+                <ref name="IDContent"/>
+                <optional>
+                    <element name="Varia">
+                        <oneOrMore>
+                            <element name="ID">
+                                <ref name="IDContent"/>
+                            </element>
+                        </oneOrMore>
+                    </element>
+                </optional>
+            </element>
+            <element name="Actions">
+                <oneOrMore>
+                    <element name="Action">
+                        <ref name="GenericTypeElement"/>
+                        <element name="Time">
+                            <ref name="Year"/>
+                            <ref name="MonthDay"/>
+                            <ref name="HourMinuteSecond"/>
+                        </element>
+                        <optional>
+                            <element name="Notation">
+                                <attribute name="class">
+                                    <value>documentation</value>
+                                </attribute>
+                                <ref name="GenericLangAttribute"/>
+                                <optional>
+                                    <ref name="GenericTypeElement"/>
+                                </optional>
+                                <ref name="GenericValueElement"/>
+                            </element>
+                        </optional>
+                    </element>
+                </oneOrMore>
+            </element>
+            <element name="Types">
+                <oneOrMore>
+                    <ref name="GenericTypeElement"/>
+                </oneOrMore>
+            </element>
+        </element>
+    </define>
+    
+    <define name="IDContent">
+        <element name="Organization">
+            <optional>
+                <attribute name="id"/>
+                <optional>
+                    <attribute name="substitute">
+                        <value>Code</value>
+                    </attribute>
+                </optional>
+            </optional>
+            <text/>
+        </element>
+        <ref name="GenericValueElement"/>
+    </define>
+    
+    <!-- ************************** CONCEPT ***************************** -->
+    
+    <define name="Concept">
+        <element name="Concept">
+            <optional>
+                <attribute name="type">
+                    <choice>
+                        <value>abstract</value>
+                        <value>collective</value>
+                        <value>control</value>
+                        <value>specific</value>
+                    </choice>
+                </attribute>
+            </optional>
+            <optional>
+                <attribute name="usage">
+                    <value>subdivision</value>
+                </attribute>
+                <attribute name="subtype">
+                    <choice>
+                        <value>general</value>
+                        <value>form</value>
+                        <value>topical</value>
+                        <value>unspecified</value>
+                    </choice>
+                </attribute>
+            </optional>
+            <element name="Entry">
+                <ref name="ConceptEntry"/>
+            </element>
+            <ref name="GenericEntrySubstitutes"/>
+            <optional>
+                <element name="Varia">
+                    <oneOrMore>
+                        <element name="Variant">
+                            <ref name="GenericTypeElement"/>
+                            <ref name="TimeSpanOptions"/>
+                            <element name="Concept">
+                                <ref name="ConceptEntry"/>
+                            </element>
+                        </element>
+                    </oneOrMore>
+                </element>
+            </optional>
+            <ref name="GenericDescriptionElement"/>
+        </element>
+    </define>
+
+    <define name="ConceptEntry">
+        <ref name="GenericSchemeAttribute"/>
+        <ref name="GenericLangTranslitAttributes"/>
+        <ref name="GenericNameElement"/>
+        <ref name="GenericQualifiers"/>
+    </define>
+    
+    <!-- *************************** STRING ***************************** -->
+    
+    <define name="String" cc:class="XOBIS_String">
+        <element name="String">
+            <optional>
+                <attribute name="type">
+                    <choice>
+                        <value>textual</value>
+                        <value>numeric</value>
+                        <value>mixed</value>
+                    </choice>
+                </attribute>
+            </optional>
+            <element name="Entry">
+                <ref name="StringClass"/>
+                <attribute name="grammar"/>
+                <ref name="StringEntry"/>
+            </element>
+            <ref name="GenericEntrySubstitutes"/>
+            <optional>
+                <element name="Varia">
+                    <oneOrMore>
+                        <element name="Variant">
+                            <ref name="GenericTypeElement"/>
+                            <ref name="TimeSpanOptions"/>
+                            <element name="String">
+                                <ref name="StringClass"/>
+                                <attribute name="grammar"/>
+                                <ref name="StringEntry"/>
+                            </element>
+                        </element>
+                    </oneOrMore>
+                </element>
+            </optional>
+            <ref name="GenericDescriptionElement"/>
+        </element>
+    </define>
+    
+    <define name="StringClass">
+        <optional>
+            <attribute name="class">
+                <choice>
+                    <value>word</value>
+                    <value>phrase</value>
+                </choice>
+            </attribute>
+        </optional>
+    </define>
+    
+    <define name="StringEntry">
+        <ref name="GenericLangTranslitAttributes"/>
+        <ref name="GenericNameElement"/>
+        <ref name="GenericQualifiers"/>
+    </define>
+    
+    <!-- ************************** LANGUAGE *************************** -->
+    
+    <define name="Language">
+        <element name="Language">
+            <ref name="GenericSubdivisionAttribute"/>
+            <element name="Entry">
+                <optional>
+                    <attribute name="class">
+                        <choice>
+                            <value>individual</value>
+                            <value>other</value>
+                            <value>referential</value>
+                        </choice>
+                    </attribute>
+                </optional>
+                <ref name="LanguageEntry"/>
+            </element>
+            <ref name="GenericEntrySubstitutes"/>
+            <optional>
+                <element name="Varia">
+                    <oneOrMore>
+                        <element name="Variant">
+                            <ref name="GenericTypeElement"/>
+                            <ref name="TimeSpanOptions"/>
+                            <element name="Language">
+                                <ref name="LanguageEntry"/>
+                            </element>
+                        </element>
+                    </oneOrMore>
+                </element>
+            </optional>
+            <ref name="GenericDescriptionElement"/>
+        </element>
+    </define>
+    
+    <define name="LanguageEntry">
+        <ref name="GenericSchemeAttribute"/>
+        <ref name="GenericLangTranslitAttributes"/>
+        <ref name="GenericNameElement"/>
+        <ref name="GenericQualifiers"/>
+    </define>
+    
+    <!-- *********************** ORGANIZATION ************************ -->
+    
+    <define name="Organization">
+        <element name="Organization">
+            <optional>
+                <attribute name="type">
+                    <choice>
+                        <value>business</value>
+                        <value>government</value>
+                        <value>nonprofit</value>
+                        <value>other</value>
+                    </choice>
+                </attribute>
+            </optional>
+            <element name="Entry">
+                <ref name="GenericClassAttribute"/>
+                <ref name="OrganizationEntry"/>
+            </element>
+            <ref name="GenericEntrySubstitutes"/>
+            <optional>
+                <element name="Varia">
+                    <oneOrMore>
+                        <element name="Variant">
+                            <ref name="GenericTypeElement"/>
+                            <ref name="TimeSpanOptions"/>
+                            <element name="Organization">
+                                <ref name="OrganizationEntry"/>
+                            </element>
+                        </element>
+                    </oneOrMore>
+                </element>
+            </optional>
+            <ref name="GenericDescriptionElement"/>
+        </element>
+    </define>
+    
+    <define name="OrganizationEntry">
+        <ref name="GenericSchemeAttribute"/>
+        <ref name="GenericLangTranslitAttributes"/>
+        <ref name="GenericPreQualifiers"/>
+        <ref name="GenericNameElement"/>
+        <ref name="GenericQualifiers"/>
+    </define>
+    
+    <!-- ************************* EVENT ************************** -->
+
+    <define name="Event">
+        <element name="Event">
+            <optional>
+                <attribute name="type">
+                    <choice>
+                        <value>natural</value>
+                        <value>meeting</value>
+                        <value>journey</value>
+                        <value>occurrence</value>
+                        <value>miscellaneous</value>
+                    </choice>
+                </attribute>
+            </optional>
+            <element name="Entry">
+                <ref name="GenericTypeAttribute"/>
+                <ref name="GenericClassAttribute"/>
+                <ref name="EventEntry"/>
+            </element>
+            <ref name="GenericEntrySubstitutes"/>
+            <optional>
+                <element name="Varia">
+                    <oneOrMore>
+                        <element name="Variant">
+                            <ref name="GenericTypeElement"/>
+                            <ref name="TimeSpanOptions"/>
+                            <element name="Event">
+                                <ref name="EventEntry"/>
+                            </element>
+                        </element>
+                    </oneOrMore>
+                </element>
+            </optional>
+            <ref name="GenericDescriptionElement"/>
+        </element>
+    </define>
+    
+    <define name="EventEntry">
+        <ref name="GenericSchemeAttribute"/>
+        <ref name="GenericLangTranslitAttributes"/>
+        <ref name="GenericPreQualifiers"/>
+        <ref name="GenericNameElement"/>
+        <ref name="GenericQualifiers"/>
+    </define>
+
+    <!-- ************************** TIME ****************************** -->
+    
+    <define name="Time" cc:class="TIME">
+        <element name="Time">
+            <ref name="GenericSubdivisionAttribute"/>
+            <element name="Entry">
+                <choice>
+                    <group>
+                        <optional>
+                            <attribute name="class">
+                                <choice>
+                                    <value>individual</value>
+                                    <value>referential</value>
+                                </choice>
+                            </attribute>
+                        </optional>
+                        <ref name="GenericLangTranslitAttributes"/>
+                        <ref name="TimeCalendarSchemeAttributes"/>
+                        <ref name="TimeEntry"/>
+                    </group>
+                    <group>
+                        <optional>
+                            <attribute name="class">
+                                <choice>
+                                    <value>collective</value>
+                                    <value>referential</value>
+                                </choice>
+                            </attribute>
+                        </optional>
+                        <ref name="SimpleDurationElement"/>
+                    </group>
+                </choice>
+            </element>
+            <ref name="GenericEntrySubstitutes"/>
+            <optional>
+                <element name="Varia">
+                    <oneOrMore>
+                        <element name="Variant">
+                            <ref name="GenericTypeElement"/>
+                            <choice>
+                                <element name="Time">
+                                    <ref name="GenericLangTranslitAttributes"/>
+                                    <ref name="TimeCalendarSchemeAttributes"/>
+                                    <ref name="TimeEntry"/>
+                                </element>
+                                <ref name="SimpleDurationElement"/>
+                            </choice>
+                        </element>
+                    </oneOrMore>
+                </element>
+            </optional>
+            <ref name="GenericDescriptionElement"/>
+        </element>
+    </define>
+
+    <define name="TimeEntry">
+        <choice>
+            <group>
+                <ref name="Year"/>
+                <optional>
+                    <ref name="MonthDay"/>
+                    <optional>
+                        <ref name="HourMinuteSecond"/>
+                        <optional>
+                            <ref name="CompleteTimeElements"/>
+                        </optional>
+                    </optional>
+                </optional>
+            </group>
+            <ref name="GenericNameElement"/>
+	</choice>
+    </define>
+    
+    <define name="TimeCalendarSchemeAttributes">
+        <optional>
+            <attribute name="calendar"/>
+        </optional>
+        <ref name="GenericSchemeAttribute"/>
+    </define>
+    
+    <define name="CompleteTimeElements">
+        <element name="Millisecs">
+            <text/>
+        </element>
+        <optional>
+            <element name="TZHour">
+                <text/>
+            </element>
+            <element name="TZMinute">
+                <text/>
+            </element>
+        </optional>
+    </define>
+    
+    <define name="HourMinuteSecond">
+        <element name="Hour">
+            <text/>
+        </element>
+        <element name="Minute">
+            <text/>
+        </element>
+        <element name="Second">
+            <text/>
+        </element>
+    </define>
+    
+    <define name="MonthDay">
+        <element name="Month">
+            <text/>
+        </element>
+        <element name="Day">
+            <text/>
+        </element>
+    </define>
+    
+    <define name="Year">
+        <element name="Year">
+            <text/>
+        </element>
+    </define>
+    
+    <define name="ImplicitTimeRelationship">
+        <optional>
+            <ref name="GenericTypeElement"/>
+        </optional> <!-- ? -->
+        <optional>
+            <element name="Certainty">
+                <optional>
+                    <attribute name="set"/>
+                </optional>
+                <text/>
+            </element>
+        </optional>
+    </define>
+    
+    <define name="PlainTimeElement">
+        <element name="Time">
+            <ref name="TimeEntry"/>
+        </element>
+    </define>
+    
+    <define name="SimpleTimeElement">
+        <element name="Time">
+            <optional>
+                <ref name="GenericTypeElement"/>
+            </optional> <!-- ? -->
+            <ref name="TimeEntry"/>
+        </element>
+    </define>
+    
+    <define name="ReferentialTimeElement">
+        <element name="Time">
+            <ref name="GenericReferentialAttributes"/>
+            <ref name="TimeEntry"/>
+        </element>
+    </define>
+    
+    <define name="RelatedReferentialTimeElement">
+        <element name="Time">
+            <ref name="GenericReferentialAttributes"/>
+            <ref name="ImplicitTimeRelationship"/>
+            <ref name="TimeEntry"/>
+        </element>
+    </define>
+    
+    <define name="SimpleDurationElement">
+        <element name="Duration">
+            <ref name="GenericLangTranslitAttributes"/>
+            <ref name="TimeCalendarSchemeAttributes"/>
+            <choice>
+                <group>
+                    <optional>
+                        <ref name="GenericTypeElement"/>
+                    </optional> <!-- ? -->
+                    <ref name="PlainTimeElement"/>
+                    <ref name="PlainTimeElement"/>
+                </group>
+                <group>
+                    <ref name="SimpleTimeElement"/>
+                    <ref name="SimpleTimeElement"/>
+                </group>
+            </choice>
+        </element>
+    </define>
+    
+    <define name="TimeSpanOptions">
+        <optional>
+            <choice>
+                <element name="Time">
+                    <ref name="GenericReferentialAttributes"/>
+                    <ref name="TimeCalendarSchemeAttributes"/>
+                    <ref name="ImplicitTimeRelationship"/>
+                    <ref name="TimeEntry"/>
+                </element>
+                <oneOrMore>
+                    <element name="Times">
+                        <ref name="GenericLangTranslitAttributes"/>
+                        <ref name="TimeCalendarSchemeAttributes"/>
+                        <ref name="ImplicitTimeRelationship"/>
+                        <ref name="ReferentialTimeElement"/>
+                        <ref name="ReferentialTimeElement"/>
+                    </element>
+                </oneOrMore>
+                <oneOrMore>
+                    <element name="Duration">
+                        <ref name="GenericLangTranslitAttributes"/>
+                        <ref name="TimeCalendarSchemeAttributes"/>
+                        <choice>
+                            <group>
+                                <ref name="RelatedReferentialTimeElement"/>
+                                <ref name="RelatedReferentialTimeElement"/>
+                            </group>
+                            <group>
+                                <ref name="GenericReferentialAttributes"/>
+                                <ref name="ImplicitTimeRelationship"/>
+                                <ref name="PlainTimeElement"/>
+                                <ref name="PlainTimeElement"/>
+                            </group>
+                        </choice>
+                    </element>
+                </oneOrMore>
+                <oneOrMore>
+                    <element name="Duration">
+                        <ref name="GenericLangTranslitAttributes"/>
+                        <ref name="TimeCalendarSchemeAttributes"/>
+                        <element name="Times">
+                            <ref name="ImplicitTimeRelationship"/>
+                            <ref name="ReferentialTimeElement"/>
+                            <ref name="ReferentialTimeElement"/>
+                        </element>
+                        <element name="Times">
+                            <ref name="ImplicitTimeRelationship"/>
+                            <ref name="RelatedReferentialTimeElement"/>
+                            <ref name="RelatedReferentialTimeElement"/>
+                        </element>
+                    </element>
+               </oneOrMore>
+            </choice>
+        </optional>
+    </define>
+    
+    <define name="RelationshipTargetTimeOptions">
+        <choice>
+            <element name="Time">
+                <ref name="GenericLangTranslitAttributes"/>
+                <ref name="GenericReferentialAttributes"/>
+                <ref name="TimeCalendarSchemeAttributes"/>
+                <ref name="TimeEntry"/>
+                <ref name="GenericSubdivisionElement"/>
+            </element>
+            <element name="Duration">
+                <ref name="GenericLangTranslitAttributes"/>
+                <ref name="TimeCalendarSchemeAttributes"/>
+                <choice>
+                    <group>
+                        <ref name="ReferentialTimeElement"/>
+                        <ref name="ReferentialTimeElement"/>
+                    </group>
+                    <group>
+                        <ref name="GenericReferentialAttributes"/>
+                        <ref name="PlainTimeElement"/>
+                        <ref name="PlainTimeElement"/>
+                    </group>
+                </choice>
+                <ref name="GenericSubdivisionElement"/>
+            </element>
+        </choice>
+    </define>
+    
+    <!-- *************************** PLACE ***************************** -->
+    
+    <define name="Place">
+        <element name="Place">
+            <optional>
+                <attribute name="type">
+                    <choice>
+                        <value>natural</value>
+                        <value>constructed</value>
+                        <value>jurisdictional</value>
+                    </choice>
+                </attribute>
+            </optional>
+            <ref name="GenericSubdivisionAttribute"/>
+            <choice>
+                <group>
+                    <ref name="GenericInstanceRole"/>
+                    <element name="Entry">
+                        <ref name="GenericClassAttribute"/>
+                        <ref name="PlaceEntry"/>
+                    </element>
+                    <ref name="GenericEntrySubstitutes"/>
+                    <ref name="PlaceVaria"/>
+                    <ref name="GenericDescriptionElement"/>
+                    <ref name="GenericHoldingsElement"/>
+                </group>
+                <group>
+                    <ref name="GenericAuthorityRole"/>
+                    <element name="Entry">
+                        <ref name="GenericClassAttribute"/>
+                        <ref name="PlaceEntry"/>
+                    </element>
+                    <ref name="GenericEntrySubstitutes"/>
+                    <ref name="PlaceVaria"/>
+                    <ref name="GenericDescriptionElement"/>
+                </group>
+            </choice>
+        </element>
+    </define>
+    
+    <define name="PlaceEntry">
+        <ref name="GenericSchemeAttribute"/>
+        <ref name="GenericLangTranslitAttributes"/>
+        <ref name="GenericNameElement"/>
+        <ref name="GenericQualifiers"/>
+    </define>
+
+    <define name="PlaceVaria">
+        <optional>
+            <element name="Varia">
+                <oneOrMore>
+                    <element name="Variant">
+                        <ref name="GenericTypeElement"/>
+                        <ref name="TimeSpanOptions"/>
+                        <element name="Place">
+                            <ref name="PlaceEntry"/>
+                        </element>
+                    </element>
+                </oneOrMore>
+            </element>
+        </optional>
+    </define>
+    
+    <!-- ************************ BEING ************************* -->
+    
+    <define name="Being">
+        <element name="Being">
+            <optional>
+                <attribute name="type">
+                    <choice>
+                        <value>human</value>
+                        <value>specimen</value>
+                        <value>special</value>
+                    </choice>
+                </attribute>
+            </optional>
+            <choice>
+                <group>
+                    <ref name="GenericInstanceRole"/>
+                    <element name="Entry">
+                        <ref name="BeingClassAttribute"/>
+                        <optional>
+                            <ref name="GenericTypeElement"/>
+                        </optional>
+                        <ref name="TimeSpanOptions"/>
+                        <ref name="BeingEntry"/>
+                    </element>
+                    <ref name="GenericEntrySubstitutes"/>
+                    <ref name="BeingVaria"/>
+                    <ref name="GenericDescriptionElement"/>
+                    <ref name="GenericHoldingsElement"/>
+                </group>
+                <group>
+                    <ref name="GenericAuthorityRole"/>
+                    <element name="Entry">
+                        <ref name="BeingClassAttribute"/>
+                        <optional>
+                            <ref name="GenericTypeElement"/>
+                        </optional>
+                        <ref name="TimeSpanOptions"/>
+                        <ref name="BeingEntry"/>
+                    </element>
+                    <ref name="GenericEntrySubstitutes"/>
+                    <ref name="BeingVaria"/>
+                    <ref name="GenericDescriptionElement"/>
+                </group>
+            </choice>
+        </element>
+    </define>
+    
+    <define name="BeingVaria">
+        <optional>
+            <element name="Varia">
+                <oneOrMore>
+                    <element name="Variant">
+                        <ref name="GenericTypeElement"/>
+                        <ref name="TimeSpanOptions"/>
+                        <element name="Being">
+                            <ref name="BeingEntry"/>
+                        </element>
+                    </element>
+                </oneOrMore>
+            </element>
+        </optional>
+    </define>
+    
+    <define name="BeingClassAttribute">
+        <optional>
+            <attribute name="class">
+                <choice>
+                    <value>individual</value>
+                    <value>familial</value>
+                    <value>collective</value>
+                    <value>undifferentiated</value>
+                    <value>referential</value>
+                </choice>
+            </attribute>
+        </optional>
+    </define>
+    
+    <define name="BeingEntry">
+        <ref name="GenericSchemeAttribute"/>
+        <ref name="GenericLangTranslitAttributes"/>
+        <choice>
+            <group>
+                <ref name="SurnameElement"/>
+                <optional>
+                    <ref name="ForenameElement"/>
+                </optional>
+                <ref name="OptionalNameExpansion"/>
+            </group>
+            <group>
+                <optional>
+                    <ref name="SurnameElement"/>
+                </optional>
+                <ref name="ForenameElement"/>
+                <ref name="OptionalNameExpansion"/>
+            </group>
+            <ref name="GenericNameElement"/>
+        </choice>
+        <ref name="GenericQualifiers"/>
+    </define>
+    
+    <define name="SurnameElement">
+        <element name="Surname">
+            <text/>
+        </element>
+    </define>
+    
+    <define name="ForenameElement">
+        <element name="Forename">
+            <text/>
+        </element>
+    </define>
+    
+    <define name="OptionalNameExpansion">
+        <optional>
+            <element name="Expansion">
+                <text/>
+            </element>
+        </optional>
+    </define>
+    
+    <!-- ************************* OBJECT ***************************** -->
+    
+    <define name="Object" cc:class="OBJECT">
+        <element name="Object">
+            <choice>
+                <group>
+                    <optional>
+                        <attribute name="type">
+                            <choice>
+                                <value>natural</value>
+                                <value>crafted</value>
+                            </choice>
+                        </attribute>
+                    </optional>
+                    <ref name="PotentiallyIdentifiedObjectContent"/>
+                </group>
+                <group>
+                    <attribute name="type">
+                        <value>manufactured</value>
+                    </attribute>
+                    <ref name="ObjectContent"/>
+                </group>
+            </choice>
+        </element>
+    </define>
+    
+    <define name="ObjectContent">
+        <choice>
+            <group>
+                <ref name="ObjectDualRoleAttribute"/>
+                <element name="Entry">
+                    <ref name="ObjectDoubleClassAttribute"/>
+                    <ref name="ObjectEntry"/>
+                </element>
+                <ref name="GenericEntrySubstitutes"/>
+                <ref name="ObjectVaria"/>
+                <ref name="GenericDescriptionElement"/>
+                <ref name="GenericHoldingsElement"/>
+                <ref name="ObjectVersions"/>
+            </group>
+            <group>
+                <ref name="ObjectSingleRoleAttribute"/>
+                <element name="Entry">
+                    <ref name="ObjectTripleClassAttribute"/>
+                    <ref name="ObjectEntry"/>
+                </element>
+                <ref name="GenericEntrySubstitutes"/>
+                <ref name="ObjectVaria"/>
+                <ref name="GenericDescriptionElement"/>
+                <ref name="GenericHoldingsElement"/>
+            </group>
+        </choice>
+    </define>
+    
+    <define name="PotentiallyIdentifiedObjectContent">
+        <choice>
+            <group>
+                <ref name="ObjectDualRoleAttribute"/>
+                <element name="Entry">
+                    <ref name="ObjectDoubleClassAttribute"/>
+                    <ref name="ObjectEntryIdentified"/>
+                </element>
+                <ref name="GenericEntrySubstitutes"/>
+                <ref name="ObjectVaria"/>
+                <ref name="GenericDescriptionElement"/>
+                <ref name="GenericHoldingsElement"/>
+                <ref name="ObjectVersions"/>
+            </group>
+            <group>
+                <ref name="ObjectSingleRoleAttribute"/>
+                <element name="Entry">
+                    <ref name="ObjectTripleClassAttribute"/>
+                    <ref name="ObjectEntryIdentified"/>
+                </element>
+                <ref name="GenericEntrySubstitutes"/>
+                <ref name="ObjectVaria"/>
+                <ref name="GenericDescriptionElement"/>
+                <ref name="GenericHoldingsElement"/>
+            </group>
+        </choice>
+    </define>
+    
+    <define name="ObjectDualRoleAttribute">
+        <attribute name="role">
+            <choice>
+                <value>instance</value>
+                <value>authority/instance</value>
+            </choice>
+        </attribute>
+    </define>
+    
+    <define name="ObjectDoubleClassAttribute">
+        <optional>
+            <attribute name="class">
+                <choice>
+                    <value>individual</value>
+                    <value>collective</value>
+                </choice>
+            </attribute>
+        </optional>
+    </define>
+
+    <define name="ObjectSingleRoleAttribute">
+        <attribute name="role">
+            <value>authority</value>
+        </attribute>
+    </define>
+    
+    <define name="ObjectTripleClassAttribute">
+        <optional>
+            <attribute name="class">
+                <choice>
+                    <value>individual</value>
+                    <value>collective</value>
+                    <value>referential</value>
+                </choice>
+            </attribute>
+        </optional>
+    </define>
+    
+    <define name="ObjectVaria">
+        <optional>
+            <element name="Varia">
+                <oneOrMore>
+                    <element name="Variant">
+                        <ref name="GenericTypeElement"/>
+                        <ref name="TimeSpanOptions"/>
+                        <element name="Object">
+                            <ref name="ObjectEntry"/>
+                        </element>
+                   </element>
+                </oneOrMore>
+            </element>
+        </optional>
+    </define>
+    
+    <define name="ObjectVersions">
+        <optional>
+            <element name="Versions">
+                <oneOrMore>
+                    <element name="Version">
+                        <element name="ID">
+                            <text/>
+                        </element>
+                        <ref name="GenericQualifiers"/>
+                        <ref name="ObjectVaria"/>
+                        <ref name="GenericDescriptionElement"/>
+                        <ref name="GenericHoldingsElement"/>
+                        <optional>
+                            <ref name="Relationships"/>
+                        </optional>
+                    </element>
+                </oneOrMore>
+            </element>
+        </optional>
+    </define>
+    
+    <define name="ObjectEntry">
+        <ref name="GenericLangTranslitAttributes"/>
+        <choice>
+            <group>
+                <ref name="GenericNameElement"/>
+                <ref name="GenericQualifiers"/>
+            </group>
+            <oneOrMore>
+                <element name="NameSegment">
+                    <ref name="GenericNonfilingAttribute"/>
+                    <text/>
+                </element>
+                <ref name="GenericQualifiers"/>
+            </oneOrMore>
+        </choice>
+    </define>
+    
+    <define name="ObjectEntryIdentified">
+        <ref name="ObjectEntry"/>
+        <element name="Identifier">
+            <element name="Organization">
+                <ref name="GenericReferentialAttributes"/>
+                <ref name="OrganizationEntry"/>
+            </element>
+            <element name="String">
+                <ref name="GenericReferentialAttributes"/>
+                <ref name="StringEntry"/>
+            </element>
+        </element>
+    </define>
+    
+    <!-- ************************** WORK **************************** -->
+    
+    <define name="Work">
+        <element name="Work">
+            <optional>
+                <attribute name="type">
+                    <choice>
+                        <value>intellectual</value>
+                        <value>artistic</value>
+                    </choice>
+                </attribute>
+            </optional>
+            <choice>
+                <group>
+                    <ref name="GenericInstanceRole"/>
+                    <element name="Entry">
+                        <ref name="WorkClassAttribute"/>
+                        <ref name="GenericTypeAttribute"/>
+                        <ref name="WorkEntry"/>
+                    </element>
+                    <ref name="GenericEntrySubstitutes"/>
+                    <ref name="WorkVaria"/>
+                    <ref name="GenericDescriptionElement"/>
+                    <ref name="GenericHoldingsElement"/>
+                    <ref name="WorkVersions"/>
+                </group>
+                <group>
+                    <ref name="GenericAuthorityRole"/>
+                    <element name="Entry">
+                        <ref name="WorkClassAttribute"/>
+                        <ref name="GenericTypeAttribute"/>
+                        <ref name="WorkEntry"/>
+                    </element>
+                    <ref name="GenericEntrySubstitutes"/>
+                    <ref name="WorkVaria"/>
+                    <ref name="GenericDescriptionElement"/>
+                </group>
+            </choice>
+        </element>
+    </define>
+    
+    <define name="WorkClassAttribute">
+        <optional>
+            <attribute name="class">
+                <choice>
+                    <value>individual</value>
+                    <value>serial</value>
+                    <value>collective</value>
+                    <value>referential</value>
+                </choice>
+            </attribute>
+        </optional>
+    </define>
+    
+    <define name="WorkVaria">
+        <optional>
+            <element name="Varia">
+                <oneOrMore>
+                    <element name="Variant">
+                        <ref name="GenericTypeElement"/>
+                        <ref name="TimeSpanOptions"/>
+                        <element name="Work">
+                            <ref name="WorkEntry"/>
+                        </element>
+                    </element>
+                </oneOrMore>
+            </element>
+        </optional>
+    </define>
+    
+    <define name="WorkVersions">
+        <optional>
+            <element name="Versions">
+                <oneOrMore>
+                    <element name="Version">
+                        <element name="ID">
+                            <text/>
+                        </element>
+                        <ref name="GenericQualifiers"/>
+                        <ref name="WorkVaria"/>
+                        <ref name="GenericDescriptionElement"/>
+                        <ref name="GenericHoldingsElement"/>
+                        <optional>
+                            <ref name="Relationships"/>
+                        </optional>
+                    </element>
+                </oneOrMore>
+            </element>
+        </optional>
+    </define>
+    
+    <define name="WorkEntry">
+        <ref name="GenericSchemeAttribute"/>
+        <ref name="GenericLangTranslitAttributes"/>
+        <choice>
+            <group>
+                <element name="Title">
+                    <ref name="GenericNonfilingAttribute"/>
+                    <text/>
+                </element>
+                <ref name="GenericQualifiers"/>
+            </group>
+            <oneOrMore>
+                <element name="TitleSegment">
+                    <optional>
+                        <attribute name="type">
+                            <choice>
+                                <value>subtitle</value>
+                                <value>section</value>
+                            </choice>
+                        </attribute>
+                    </optional>
+                    <ref name="GenericNonfilingAttribute"/>
+                    <text/>
+                </element>
+                <ref name="GenericQualifiers"/>
+            </oneOrMore>
+        </choice>
+    </define>
+    
+    <!-- ************************* RELATIONS ************************** -->
+    
+    <define name="Relationships">
+        <element name="Relationships">
+            <oneOrMore>
+                <element name="Relationship">
+                    <choice>
+                        <group>
+                            <attribute name="class">
+                                <value>conceptual</value>
+                            </attribute>
+                            <ref name="RelationshipTypeAttribute"/>
+                            <optional>
+                                <attribute name="degree">
+                                    <choice>
+                                        <value>primary</value>
+                                        <value>secondary</value>
+                                        <value>tertiary</value>
+                                        <value>broad</value>
+                                    </choice>
+                                </attribute>
+                            </optional>
+                            <ref name="RelationshipNameElement"/>
+                            <ref name="RelationshipModifier"/>
+                            <ref name="TimeSpanOptions"/>
+                            <optional>
+                                <element name="Concept">
+                                    <ref name="GenericReferentialAttributes"/>
+                                    <ref name="ConceptEntry"/>
+                                    <ref name="GenericSubdivisionElement"/>
+                                </element>
+                            </optional>
+                            <ref name="GenericDescriptionElement"/>
+                        </group>
+                        <group>
+                            <attribute name="class">
+                                <value>lexical</value>
+                            </attribute>
+                            <ref name="RelationshipTypeAttribute"/>
+                            <ref name="RelationshipDegreeAttribute"/>
+                            <ref name="RelationshipNameElement"/>
+                            <ref name="RelationshipModifier"/>
+                            <ref name="TimeSpanOptions"/>
+                            <optional>
+                                <element name="String">
+                                    <ref name="GenericReferentialAttributes"/>
+                                    <ref name="StringEntry"/>
+                                </element>
+                            </optional>
+                            <ref name="GenericDescriptionElement"/>
+                        </group>
+                        <group>
+                            <attribute name="class">
+                                <value>linguistic</value>
+                            </attribute>
+                            <ref name="RelationshipTypeAttribute"/>
+                            <ref name="RelationshipDegreeAttribute"/>
+                            <ref name="RelationshipNameElement"/>
+                            <ref name="RelationshipModifier"/>
+                            <ref name="TimeSpanOptions"/>
+                            <optional>
+                                <element name="Language">
+                                    <ref name="GenericReferentialAttributes"/>
+                                    <ref name="LanguageEntry"/>
+                                    <ref name="GenericSubdivisionElement"/>
+                                </element>
+                            </optional>
+                            <ref name="GenericDescriptionElement"/>
+                        </group>
+                        <group>
+                            <attribute name="class">
+                                <value>organizational</value>
+                            </attribute>
+                            <ref name="RelationshipTypeAttribute"/>
+                            <ref name="RelationshipDegreeAttribute"/>
+                            <ref name="RelationshipNameElement"/>
+                            <ref name="RelationshipModifier"/>
+                            <ref name="TimeSpanOptions"/>
+                            <optional>
+                                <element name="Organization">
+                                    <ref name="GenericReferentialAttributes"/>
+                                    <ref name="OrganizationEntry"/>
+                                    <ref name="GenericSubdivisionElement"/>
+                                </element>
+                            </optional>
+                            <ref name="GenericDescriptionElement"/>
+                        </group>
+                        <group>
+                            <attribute name="class">
+                                <value>episodic</value>
+                            </attribute>
+                            <ref name="RelationshipTypeAttribute"/>
+                            <ref name="RelationshipDegreeAttribute"/>
+                            <ref name="RelationshipNameElement"/>
+                            <ref name="RelationshipModifier"/>
+                            <ref name="TimeSpanOptions"/>
+                            <optional>
+                                <element name="Event">
+                                    <ref name="GenericReferentialAttributes"/>
+                                    <ref name="EventEntry"/>
+                                    <ref name="GenericSubdivisionElement"/>
+                                </element>
+                            </optional>
+                            <ref name="GenericDescriptionElement"/>
+                        </group>
+                        <group>
+                            <attribute name="class">
+                                <value>chronological</value>
+                            </attribute>
+                            <ref name="RelationshipTypeAttribute"/>
+                            <ref name="RelationshipDegreeAttribute"/>
+                            <ref name="RelationshipNameElement"/>
+                            <ref name="RelationshipModifier"/>
+                            <optional>
+                                <ref name="RelationshipTargetTimeOptions"/>
+                            </optional>
+                            <ref name="GenericDescriptionElement"/>
+                        </group>
+                        <group>
+                            <attribute name="class">
+                                <value>geographic</value>
+                            </attribute>
+                            <ref name="RelationshipTypeAttribute"/>
+                            <ref name="RelationshipDegreeAttribute"/>
+                            <ref name="RelationshipNameElement"/>
+                            <ref name="RelationshipModifier"/>
+                            <ref name="TimeSpanOptions"/>
+                            <optional>
+                                <element name="Place">
+                                    <ref name="GenericReferentialAttributes"/>
+                                    <ref name="PlaceEntry"/>
+                                    <ref name="GenericSubdivisionElement"/>
+                                </element>
+                            </optional>
+                            <ref name="GenericDescriptionElement"/>
+                        </group>
+                        <group>
+                            <attribute name="class">
+                                <value>vital</value>
+                            </attribute>
+                            <ref name="RelationshipTypeAttribute"/>
+                            <ref name="RelationshipDegreeAttribute"/>
+                            <ref name="RelationshipNameElement"/>
+                            <ref name="RelationshipModifier"/>
+                            <ref name="TimeSpanOptions"/>
+                            <optional>
+                                <element name="Being">
+                                    <ref name="GenericReferentialAttributes"/>
+                                    <ref name="BeingEntry"/>
+                                    <ref name="GenericSubdivisionElement"/>
+                                </element>
+                            </optional>
+                            <ref name="GenericDescriptionElement"/>
+                        </group>
+                        <group>
+                            <attribute name="class">
+                                <value>material</value>
+                            </attribute>
+                            <ref name="RelationshipTypeAttribute"/>
+                            <ref name="RelationshipDegreeAttribute"/>
+                            <ref name="RelationshipNameElement"/>
+                            <ref name="RelationshipModifier"/>
+                            <ref name="TimeSpanOptions"/>
+                            <optional>
+                                <element name="Object">
+                                    <ref name="GenericReferentialAttributes"/>
+                                    <ref name="ObjectEntry"/>
+                                    <ref name="GenericSubdivisionElement"/>
+                                </element>
+                            </optional>
+                            <ref name="GenericDescriptionElement"/>
+                        </group>
+                        <group>
+                            <attribute name="class">
+                                <value>compositional</value>
+                            </attribute>
+                            <ref name="RelationshipTypeAttribute"/>
+                            <ref name="RelationshipDegreeAttribute"/>
+                            <ref name="RelationshipNameElement"/>
+                            <ref name="RelationshipModifier"/>
+                            <ref name="TimeSpanOptions"/>
+                            <optional>
+                                <element name="Work">
+                                    <ref name="GenericReferentialAttributes"/>
+                                    <ref name="WorkEntry"/>
+                                    <ref name="GenericSubdivisionElement"/>
+                                </element>
+                            </optional>
+                            <ref name="GenericDescriptionElement"/>
+                        </group>
+                    </choice>
+                </element>
+            </oneOrMore>
+        </element>
+    </define>
+    
+    <define name="RelationshipModifier">
+        <optional>
+            <element name="Modifier">
+                <ref name="GenericNonfilingAttribute"/>
+                <text/>
+            </element>
+        </optional>
+    </define>
+    
+    <define name="RelationshipDegreeAttribute">
+        <optional>
+            <attribute name="degree">
+                <choice>
+                    <value>primary</value>
+                    <value>secondary</value>
+                </choice>
+            </attribute>
+        </optional>
+    </define>
+    
+    <define name="RelationshipTypeAttribute">
+        <attribute name="type">
+            <choice>
+                <value>subordinate</value>
+                <value>superordinate</value>
+                <value>preordinate</value>
+                <value>postordinate</value>
+                <value>associative</value>
+                <value>dissociative</value>
+                <value>unspecified</value>
+            </choice>
+        </attribute>
+    </define>
+    
+    <define name="RelationshipNameElement">
+        <element name="Name">
+            <text/>
+        </element>
+    </define>
+    
+    <!-- ********************** GENERIC_ELEMENTS ********************* -->
+    
+    <define name="GenericDescriptionElement">
+        <optional>
+            <element name="Description">
+                <oneOrMore>
+                    <element name="Notation">
+                        <attribute name="class">
+                            <choice>
+                                <value>transcription</value>
+                                <value>annotation</value>
+                                <value>documentation</value>
+                                <value>description</value>
+                                <value>unspecified</value>
+                            </choice>
+                        </attribute>
+                        <ref name="GenericLangAttribute"/>
+                        <optional>
+                            <ref name="GenericTypeElement"/>
+                        </optional>
+                        <ref name="GenericValueElement"/>
+                    </element>
+                </oneOrMore>
+            </element>
+        </optional>
+    </define>
+    
+    <define name="GenericClassAttribute">
+        <optional>
+            <attribute name="class">
+                <choice>
+                    <value>individual</value>
+                    <value>collective</value>
+                    <value>referential</value>
+                </choice>
+            </attribute>
+        </optional>
+    </define>
+    
+    <define name="GenericNameElement">
+        <element name="Name">
+            <ref name="GenericNonfilingAttribute"/>
+            <text/>
+        </element>
+    </define>
+    
+    <define name="GenericValueElement">
+        <element name="Value">
+            <text/>
+        </element>
+    </define>
+    
+    <define name="GenericLinkingID">
+        <optional>
+            <choice>
+                <attribute name="id"/>
+                <attribute name="href"/>
+            </choice>
+        </optional>
+    </define>
+    
+    <define name="GenericEntrySubstitutes">
+        <optional>
+            <element name="Abbrev">
+                <text/>
+            </element>
+        </optional>
+        <optional>
+            <element name="Citation">
+                <text/>
+            </element>
+        </optional>
+        <optional>
+            <element name="Code">
+                <text/>
+            </element>
+        </optional>
+        <optional>
+            <element name="Singular">
+                <text/>
+            </element>
+        </optional>
+    </define>
+
+    <define name="GenericTypeElement">
+        <element name="Type">
+            <optional>
+                <attribute name="set"/>
+            </optional>
+            <text/>
+        </element>
+    </define>
+    
+    <define name="GenericInstanceRole">
+        <attribute name="role">
+            <choice>
+                <value>instance</value>
+                <value>authority/instance</value>
+            </choice>
+        </attribute>
+    </define>
+    
+    <define name="GenericAuthorityRole">
+        <attribute name="role">
+            <value>authority</value>
+        </attribute>
+    </define>
+    
+    <define name="GenericTypeAttribute">
+        <optional>
+            <attribute name="type">
+                <value>generic</value>
+            </attribute>
+        </optional>
+    </define>
+    
+    <define name="GenericSubdivisionAttribute">
+        <optional>
+            <attribute name="usage">
+                <value>subdivision</value>
+            </attribute>
+        </optional>
+    </define>
+    
+    <define name="GenericSubdivisionElement">
+        <zeroOrMore>
+            <element name="Subdivision">
+                <ref name="GenericReferentialAttributes"/>
+                <text/>
+            </element>
+        </zeroOrMore>
+    </define>
+    
+    <define name="GenericSchemeAttribute">
+        <optional>
+            <attribute name="scheme"/>
+        </optional>
+    </define>
+    
+    <define name="GenericLangAttribute">
+        <optional>
+            <attribute name="language"/>
+        </optional>
+    </define>
+    
+    <define name="GenericLangTranslitAttributes">
+        <optional>
+            <attribute name="language"/>
+            <optional>
+                <attribute name="transliteration"/>
+            </optional>
+        </optional>
+    </define>
+    
+    <define name="GenericNonfilingAttribute">
+        <optional>
+            <attribute name="nonfiling"/>
+        </optional>
+    </define>
+    
+    <define name="GenericReferentialAttributes">
+        <optional>
+            <ref name="GenericLinkingID"/>
+            <optional>
+                <attribute name="substitute">
+                    <choice>
+                        <value>Abbrev</value>
+                        <value>Citation</value>
+                        <value>Code</value>
+                        <value>Singular</value>
+                    </choice>
+                </attribute>
+            </optional>
+        </optional>
+    </define>
+    
+    <define name="GenericHoldingsElement">
+        <optional>
+            <element name="Holdings">
+                <oneOrMore>
+                    <element name="Holding">
+                        <ref name="GenericLinkingID"/>
+                        <empty/>
+                    </element>
+                </oneOrMore>
+            </element>
+        </optional>
+    </define>
+    
+    <define name="GenericQualifiers">
+        <optional>
+            <ref name="GenericQualifiersElement"/>
+            <optional>
+                <ref name="GenericQualifiersElement"/>
+            </optional>
+        </optional>
+    </define>
+    
+    <!--here-->
+    <define name="GenericPreQualifiers">
+        <optional>
+            <element name="Qualifiers">
+                <choice>
+                    <group>
+                        <ref name="GenericOrganizationQualifier"/>
+                        <interleave>
+                            <ref name="OptionalGenericEventQualifier"/>
+                            <ref name="OptionalGenericPlaceQualifier"/>
+                        </interleave>
+                    </group>
+                    <group>
+                        <ref name="GenericEventQualifier"/>
+                        <interleave>
+                            <ref name="OptionalGenericOrganizationQualifier"/>
+                            <ref name="OptionalGenericPlaceQualifier"/>
+                        </interleave>
+                    </group>
+                    <group>
+                        <ref name="GenericPlaceQualifier"/>
+                        <interleave>
+                            <ref name="OptionalGenericOrganizationQualifier"/>
+                            <ref name="OptionalGenericEventQualifier"/>
+                        </interleave>
+                    </group>
+                </choice>
+            </element>
+        </optional>
+    </define>
+    
+    <define name="GenericQualifiersElement">
+        <element name="Qualifiers">
+            <choice>
+                <group>
+                    <ref name="GenericConceptQualifier"/>
+                    <interleave>
+                        <ref name="OptionalGenericStringQualifier"/>
+                        <ref name="OptionalGenericLanguageQualifier"/>
+                        <ref name="OptionalGenericOrganizationQualifier"/>
+                        <ref name="OptionalGenericEventQualifier"/>
+                        <ref name="OptionalGenericTimeQualifier"/>
+                        <ref name="OptionalGenericPlaceQualifier"/>
+                        <ref name="OptionalGenericBeingQualifier"/>
+                        <ref name="OptionalGenericObjectQualifier"/>
+                        <ref name="OptionalGenericWorkQualifier"/>
+                    </interleave>
+                </group>
+                <group>
+                    <ref name="GenericStringQualifier"/>
+                    <optional>
+                        <ref name="GenericStringQualifier"/>
+                    </optional>
+                    <interleave>
+                        <ref name="OptionalGenericConceptQualifier"/>
+                        <ref name="OptionalGenericLanguageQualifier"/>
+                        <ref name="OptionalGenericOrganizationQualifier"/>
+                        <ref name="OptionalGenericEventQualifier"/>
+                        <ref name="OptionalGenericTimeQualifier"/>
+                        <ref name="OptionalGenericPlaceQualifier"/>
+                        <ref name="OptionalGenericBeingQualifier"/>
+                        <ref name="OptionalGenericObjectQualifier"/>
+                        <ref name="OptionalGenericWorkQualifier"/>
+                    </interleave>
+                </group>
+                <group>
+                    <ref name="GenericLanguageQualifier"/>
+                    <interleave>
+                        <ref name="OptionalGenericConceptQualifier"/>
+                        <ref name="OptionalGenericStringQualifier"/>
+                        <ref name="OptionalGenericOrganizationQualifier"/>
+                        <ref name="OptionalGenericEventQualifier"/>
+                        <ref name="OptionalGenericTimeQualifier"/>
+                        <ref name="OptionalGenericPlaceQualifier"/>
+                        <ref name="OptionalGenericBeingQualifier"/>
+                        <ref name="OptionalGenericObjectQualifier"/>
+                        <ref name="OptionalGenericWorkQualifier"/>
+                    </interleave>
+                </group>
+                <group>
+                    <ref name="GenericOrganizationQualifier"/>
+                    <optional>
+                        <ref name="GenericOrganizationQualifier"/>
+                    </optional>
+                    <interleave>
+                        <ref name="OptionalGenericConceptQualifier"/>
+                        <ref name="OptionalGenericStringQualifier"/>
+                        <ref name="OptionalGenericLanguageQualifier"/>
+                        <ref name="OptionalGenericEventQualifier"/>
+                        <ref name="OptionalGenericTimeQualifier"/>
+                        <ref name="OptionalGenericPlaceQualifier"/>
+                        <ref name="OptionalGenericBeingQualifier"/>
+                        <ref name="OptionalGenericObjectQualifier"/>
+                        <ref name="OptionalGenericWorkQualifier"/>
+                    </interleave>
+                </group>
+                <group>
+                    <ref name="GenericEventQualifier"/>
+                    <interleave>
+                        <ref name="OptionalGenericConceptQualifier"/>
+                        <ref name="OptionalGenericStringQualifier"/>
+                        <ref name="OptionalGenericLanguageQualifier"/>
+                        <ref name="OptionalGenericOrganizationQualifier"/>
+                        <ref name="OptionalGenericTimeQualifier"/>
+                        <ref name="OptionalGenericPlaceQualifier"/>
+                        <ref name="OptionalGenericBeingQualifier"/>
+                        <ref name="OptionalGenericObjectQualifier"/>
+                        <ref name="OptionalGenericWorkQualifier"/>
+                    </interleave>
+                </group>
+                <group>
+                    <ref name="GenericTimeQualifier"/>
+                    <interleave>
+                        <ref name="OptionalGenericConceptQualifier"/>
+                        <ref name="OptionalGenericStringQualifier"/>
+                        <ref name="OptionalGenericLanguageQualifier"/>
+                        <ref name="OptionalGenericOrganizationQualifier"/>
+                        <ref name="OptionalGenericEventQualifier"/>
+                        <ref name="OptionalGenericPlaceQualifier"/>
+                        <ref name="OptionalGenericBeingQualifier"/>
+                        <ref name="OptionalGenericObjectQualifier"/>
+                        <ref name="OptionalGenericWorkQualifier"/>
+                    </interleave>
+                </group>
+                <group>
+                    <ref name="GenericPlaceQualifier"/>
+                    <interleave>
+                        <ref name="OptionalGenericConceptQualifier"/>
+                        <ref name="OptionalGenericStringQualifier"/>
+                        <ref name="OptionalGenericLanguageQualifier"/>
+                        <ref name="OptionalGenericOrganizationQualifier"/>
+                        <ref name="OptionalGenericEventQualifier"/>
+                        <ref name="OptionalGenericTimeQualifier"/>
+                        <ref name="OptionalGenericBeingQualifier"/>
+                        <ref name="OptionalGenericObjectQualifier"/>
+                        <ref name="OptionalGenericWorkQualifier"/>
+                    </interleave>
+                </group>
+                <group>
+                    <ref name="GenericBeingQualifier"/>
+                    <optional>
+                        <ref name="GenericBeingQualifier"/>
+                    </optional>
+                    <interleave>
+                        <ref name="OptionalGenericConceptQualifier"/>
+                        <ref name="OptionalGenericStringQualifier"/>
+                        <ref name="OptionalGenericLanguageQualifier"/>
+                        <ref name="OptionalGenericOrganizationQualifier"/>
+                        <ref name="OptionalGenericEventQualifier"/>
+                        <ref name="OptionalGenericTimeQualifier"/>
+                        <ref name="OptionalGenericPlaceQualifier"/>
+                        <ref name="OptionalGenericObjectQualifier"/>
+                        <ref name="OptionalGenericWorkQualifier"/>
+                    </interleave>
+                </group>
+                <group>
+                    <ref name="GenericObjectQualifier"/>
+                    <interleave>
+                        <ref name="OptionalGenericConceptQualifier"/>
+                        <ref name="OptionalGenericStringQualifier"/>
+                        <ref name="OptionalGenericLanguageQualifier"/>
+                        <ref name="OptionalGenericOrganizationQualifier"/>
+                        <ref name="OptionalGenericEventQualifier"/>
+                        <ref name="OptionalGenericTimeQualifier"/>
+                        <ref name="OptionalGenericPlaceQualifier"/>
+                        <ref name="OptionalGenericBeingQualifier"/>
+                        <ref name="OptionalGenericWorkQualifier"/>
+                    </interleave>
+                </group>
+                <group>
+                    <ref name="GenericWorkQualifier"/>
+                    <interleave>
+                        <ref name="OptionalGenericConceptQualifier"/>
+                        <ref name="OptionalGenericStringQualifier"/>
+                        <ref name="OptionalGenericLanguageQualifier"/>
+                        <ref name="OptionalGenericOrganizationQualifier"/>
+                        <ref name="OptionalGenericEventQualifier"/>
+                        <ref name="OptionalGenericTimeQualifier"/>
+                        <ref name="OptionalGenericPlaceQualifier"/>
+                        <ref name="OptionalGenericBeingQualifier"/>
+                        <ref name="OptionalGenericObjectQualifier"/>
+                    </interleave>
+                </group>
+            </choice>
+        </element>
+    </define>
+    
+    <!-- generic qualifiers -->
+    
+    <define name="GenericConceptQualifier">
+        <element name="Concept">
+            <ref name="GenericReferentialAttributes"/>
+            <ref name="ConceptEntry"/>
+        </element>
+    </define>
+    
+    <define name="OptionalGenericConceptQualifier">
+        <optional>
+            <ref name="GenericConceptQualifier"/>
+        </optional>
+    </define>
+    
+    <define name="GenericStringQualifier">
+        <element name="String">
+            <ref name="GenericReferentialAttributes"/>
+            <ref name="StringEntry"/>
+        </element>
+    </define>
+    
+    <define name="OptionalGenericStringQualifier">
+        <optional>
+            <ref name="GenericStringQualifier"/>
+            <optional>
+                <ref name="GenericStringQualifier"/>
+            </optional>
+        </optional>
+    </define>
+    
+    <define name="GenericLanguageQualifier">
+        <element name="Language">
+            <ref name="GenericReferentialAttributes"/>
+            <ref name="LanguageEntry"/>
+        </element>
+    </define>
+    
+    <define name="OptionalGenericLanguageQualifier">
+        <optional>
+            <ref name="GenericLanguageQualifier"/>
+        </optional>
+    </define>
+    
+    <define name="GenericOrganizationQualifier">
+        <element name="Organization">
+            <ref name="GenericReferentialAttributes"/>
+            <ref name="OrganizationEntry"/>
+        </element>
+    </define>
+    
+    <define name="OptionalGenericOrganizationQualifier">
+        <optional>
+            <ref name="GenericOrganizationQualifier"/>
+            <optional>
+                <ref name="GenericOrganizationQualifier"/>
+            </optional>
+        </optional>
+    </define>
+    
+    <define name="GenericEventQualifier">
+        <element name="Event">
+            <ref name="GenericReferentialAttributes"/>
+            <ref name="EventEntry"/>
+        </element>
+    </define>
+    
+    <define name="OptionalGenericEventQualifier">
+        <optional>
+            <ref name="GenericEventQualifier"/>
+        </optional>
+    </define>
+    
+    <define name="GenericTimeQualifier">
+        <choice>
+            <element name="Time">
+                <ref name="GenericLangTranslitAttributes"/>
+                <ref name="GenericReferentialAttributes"/>
+                <ref name="TimeCalendarSchemeAttributes"/>
+                <ref name="TimeEntry"/>
+            </element>
+            <element name="Duration">
+                <ref name="GenericLangTranslitAttributes"/>
+                <ref name="TimeCalendarSchemeAttributes"/>
+                <choice>
+                    <group>
+                        <ref name="ReferentialTimeElement"/>
+                        <ref name="ReferentialTimeElement"/>
+                    </group>
+                    <group>
+                        <ref name="GenericReferentialAttributes"/>
+                        <ref name="PlainTimeElement"/>
+                        <ref name="PlainTimeElement"/>
+                    </group>
+                </choice>
+            </element>
+        </choice>
+    </define>
+    
+    <define name="OptionalGenericTimeQualifier">
+        <optional>
+            <ref name="GenericTimeQualifier"/>
+        </optional>
+    </define>
+    
+    <define name="GenericPlaceQualifier">
+        <element name="Place">
+            <ref name="GenericReferentialAttributes"/>
+            <ref name="PlaceEntry"/>
+        </element>
+    </define>
+    
+    <define name="OptionalGenericPlaceQualifier">
+        <optional>
+            <ref name="GenericPlaceQualifier"/>
+        </optional>
+    </define>
+    
+    <define name="GenericBeingQualifier">
+        <element name="Being">
+            <ref name="GenericReferentialAttributes"/>
+            <ref name="BeingEntry"/>
+        </element>
+    </define>
+    
+    <define name="OptionalGenericBeingQualifier">
+        <optional>
+            <ref name="GenericBeingQualifier"/>
+            <optional>
+                <ref name="GenericBeingQualifier"/>
+            </optional>
+        </optional>
+    </define>
+    
+    <define name="GenericObjectQualifier">
+        <element name="Object">
+            <ref name="GenericReferentialAttributes"/>
+            <ref name="ObjectEntry"/>
+        </element>
+    </define>
+    
+    <define name="OptionalGenericObjectQualifier">
+        <optional>
+            <ref name="GenericObjectQualifier"/>
+        </optional>
+    </define>
+
+    <define name="GenericWorkQualifier">
+        <element name="Work">
+            <ref name="GenericReferentialAttributes"/>
+            <ref name="WorkEntry"/>
+        </element>
+    </define>
+    
+    <define name="OptionalGenericWorkQualifier">
+        <optional>
+            <ref name="GenericWorkQualifier"/>
+        </optional>
+    </define>
+
+</grammar>
